@@ -1,5 +1,6 @@
-SHELL := $(shell which bash)
-SELF  := $(patsubst %/,%,$(dir $(abspath $(firstword $(MAKEFILE_LIST)))))
+VERSION := v1.0.0
+SHELL   := $(shell which bash)
+SELF    := $(patsubst %/,%,$(dir $(abspath $(firstword $(MAKEFILE_LIST)))))
 
 HOSTS  ?= c1 c2 c3
 DOMAIN ?= poc.lh
