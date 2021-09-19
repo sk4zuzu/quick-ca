@@ -161,7 +161,154 @@ wildcard.poc.lh.chain.pem
 wildcard.poc.lh.key.pem
 ```
 
-### 3.2 Custom hosts
+### 3.2 Custom domain
+
+```
+$ make DOMAIN=example.org
+openssl genrsa -out /home/asd/_git/quick-ca/example.org.key.pem 4096
+openssl genrsa -out /home/asd/_git/quick-ca/c1.example.org.key.pem 4096
+openssl genrsa -out /home/asd/_git/quick-ca/c2.example.org.key.pem 4096
+openssl genrsa -out /home/asd/_git/quick-ca/c3.example.org.key.pem 4096
+openssl req \
+-x509 -new \
+-nodes -key /home/asd/_git/quick-ca/example.org.key.pem \
+-sha256 -days 4096 \
+-out /home/asd/_git/quick-ca/example.org.cacert.pem <<< "$STDIN"
+tee /home/asd/_git/quick-ca/c1.example.org.csr.cnf <<< "$STDIN"
+[req]
+default_bits = 4096
+prompt = no
+default_md = sha256
+distinguished_name = dn
+[dn]
+C = PL
+CN = c1.example.org
+openssl req \
+-new \
+-key /home/asd/_git/quick-ca/c1.example.org.key.pem \
+-config /home/asd/_git/quick-ca/c1.example.org.csr.cnf \
+-out /home/asd/_git/quick-ca/c1.example.org.csr.pem <<< "$STDIN"
+tee /home/asd/_git/quick-ca/c1.example.org.v3.ext <<< "$STDIN"
+authorityKeyIdentifier = keyid, issuer
+basicConstraints = CA:false
+keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+extendedKeyUsage = serverAuth, clientAuth, codeSigning, emailProtection
+subjectAltName = @alt_names
+[alt_names]
+DNS.1 = c1.example.org
+openssl x509 \
+-req -in /home/asd/_git/quick-ca/c1.example.org.csr.pem \
+-CAkey /home/asd/_git/quick-ca/example.org.key.pem -CA /home/asd/_git/quick-ca/example.org.cacert.pem -CAcreateserial \
+-days 4096 -sha256 -extfile /home/asd/_git/quick-ca/c1.example.org.v3.ext \
+-out /home/asd/_git/quick-ca/c1.example.org.cert.pem
+tee /home/asd/_git/quick-ca/c2.example.org.csr.cnf <<< "$STDIN"
+[req]
+default_bits = 4096
+prompt = no
+default_md = sha256
+distinguished_name = dn
+[dn]
+C = PL
+CN = c2.example.org
+openssl req \
+-new \
+-key /home/asd/_git/quick-ca/c2.example.org.key.pem \
+-config /home/asd/_git/quick-ca/c2.example.org.csr.cnf \
+-out /home/asd/_git/quick-ca/c2.example.org.csr.pem <<< "$STDIN"
+tee /home/asd/_git/quick-ca/c2.example.org.v3.ext <<< "$STDIN"
+authorityKeyIdentifier = keyid, issuer
+basicConstraints = CA:false
+keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+extendedKeyUsage = serverAuth, clientAuth, codeSigning, emailProtection
+subjectAltName = @alt_names
+[alt_names]
+DNS.1 = c2.example.org
+openssl x509 \
+-req -in /home/asd/_git/quick-ca/c2.example.org.csr.pem \
+-CAkey /home/asd/_git/quick-ca/example.org.key.pem -CA /home/asd/_git/quick-ca/example.org.cacert.pem -CAcreateserial \
+-days 4096 -sha256 -extfile /home/asd/_git/quick-ca/c2.example.org.v3.ext \
+-out /home/asd/_git/quick-ca/c2.example.org.cert.pem
+tee /home/asd/_git/quick-ca/c3.example.org.csr.cnf <<< "$STDIN"
+[req]
+default_bits = 4096
+prompt = no
+default_md = sha256
+distinguished_name = dn
+[dn]
+C = PL
+CN = c3.example.org
+openssl req \
+-new \
+-key /home/asd/_git/quick-ca/c3.example.org.key.pem \
+-config /home/asd/_git/quick-ca/c3.example.org.csr.cnf \
+-out /home/asd/_git/quick-ca/c3.example.org.csr.pem <<< "$STDIN"
+tee /home/asd/_git/quick-ca/c3.example.org.v3.ext <<< "$STDIN"
+authorityKeyIdentifier = keyid, issuer
+basicConstraints = CA:false
+keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+extendedKeyUsage = serverAuth, clientAuth, codeSigning, emailProtection
+subjectAltName = @alt_names
+[alt_names]
+DNS.1 = c3.example.org
+openssl x509 \
+-req -in /home/asd/_git/quick-ca/c3.example.org.csr.pem \
+-CAkey /home/asd/_git/quick-ca/example.org.key.pem -CA /home/asd/_git/quick-ca/example.org.cacert.pem -CAcreateserial \
+-days 4096 -sha256 -extfile /home/asd/_git/quick-ca/c3.example.org.v3.ext \
+-out /home/asd/_git/quick-ca/c3.example.org.cert.pem
+cat /home/asd/_git/quick-ca/c1.example.org.cert.pem /home/asd/_git/quick-ca/example.org.cacert.pem > /home/asd/_git/quick-ca/c1.example.org.chain.pem
+cat /home/asd/_git/quick-ca/c2.example.org.cert.pem /home/asd/_git/quick-ca/example.org.cacert.pem > /home/asd/_git/quick-ca/c2.example.org.chain.pem
+cat /home/asd/_git/quick-ca/c3.example.org.cert.pem /home/asd/_git/quick-ca/example.org.cacert.pem > /home/asd/_git/quick-ca/c3.example.org.chain.pem
+openssl genrsa -out /home/asd/_git/quick-ca/wildcard.example.org.key.pem 4096
+tee /home/asd/_git/quick-ca/wildcard.example.org.csr.cnf <<< "$STDIN"
+[req]
+default_bits = 4096
+prompt = no
+default_md = sha256
+distinguished_name = dn
+[dn]
+C = PL
+CN = *.example.org
+openssl req \
+-new \
+-key /home/asd/_git/quick-ca/wildcard.example.org.key.pem \
+-config /home/asd/_git/quick-ca/wildcard.example.org.csr.cnf \
+-out /home/asd/_git/quick-ca/wildcard.example.org.csr.pem <<< "$STDIN"
+tee /home/asd/_git/quick-ca/wildcard.example.org.v3.ext <<< "$STDIN"
+authorityKeyIdentifier = keyid, issuer
+basicConstraints = CA:false
+keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+extendedKeyUsage = serverAuth, clientAuth, codeSigning, emailProtection
+subjectAltName = @alt_names
+[alt_names]
+DNS.1 = *.example.org
+openssl x509 \
+-req -in /home/asd/_git/quick-ca/wildcard.example.org.csr.pem \
+-CAkey /home/asd/_git/quick-ca/example.org.key.pem -CA /home/asd/_git/quick-ca/example.org.cacert.pem -CAcreateserial \
+-days 4096 -sha256 -extfile /home/asd/_git/quick-ca/wildcard.example.org.v3.ext \
+-out /home/asd/_git/quick-ca/wildcard.example.org.cert.pem
+cat /home/asd/_git/quick-ca/wildcard.example.org.cert.pem /home/asd/_git/quick-ca/example.org.cacert.pem > /home/asd/_git/quick-ca/wildcard.example.org.chain.pem
+rm /home/asd/_git/quick-ca/wildcard.example.org.v3.ext /home/asd/_git/quick-ca/c2.example.org.csr.pem /home/asd/_git/quick-ca/c2.example.org.csr.cnf /home/asd/_git/quick-ca/wildcard.example.org.csr.cnf /home/asd/_git/quick-ca/c1.example.org.csr.pem /home/asd/_git/quick-ca/c1.example.org.csr.cnf /home/asd/_git/quick-ca/c3.example.org.v3.ext /home/asd/_git/quick-ca/c1.example.org.v3.ext /home/asd/_git/quick-ca/c2.example.org.v3.ext /home/asd/_git/quick-ca/c3.example.org.csr.cnf /home/asd/_git/quick-ca/wildcard.example.org.csr.pem /home/asd/_git/quick-ca/c3.example.org.csr.pem
+```
+
+```
+$ ls -1 *.pem
+c1.example.org.cert.pem
+c1.example.org.chain.pem
+c1.example.org.key.pem
+c2.example.org.cert.pem
+c2.example.org.chain.pem
+c2.example.org.key.pem
+c3.example.org.cert.pem
+c3.example.org.chain.pem
+c3.example.org.key.pem
+example.org.cacert.pem
+example.org.key.pem
+wildcard.example.org.cert.pem
+wildcard.example.org.chain.pem
+wildcard.example.org.key.pem
+```
+
+### 3.3 Custom hosts
 
 ```
 $ make HOSTS="a b c"
@@ -308,7 +455,7 @@ wildcard.poc.lh.chain.pem
 wildcard.poc.lh.key.pem
 ```
 
-### 3.3 Wildcard only
+### 3.4 Wildcard only
 
 ```
 $ make HOSTS=
@@ -359,7 +506,7 @@ wildcard.poc.lh.chain.pem
 wildcard.poc.lh.key.pem
 ```
 
-### 3.4 Clean
+### 3.5 Clean
 
 **WARN: it removes everything!**
 
