@@ -3,7 +3,7 @@ SHELL   := $(shell which bash)
 SELF    := $(patsubst %/,%,$(dir $(abspath $(firstword $(MAKEFILE_LIST)))))
 
 HOSTS  ?= c1 c2 c3
-DOMAIN ?= poc.lh
+DOMAIN ?= poc.svc
 
 BITS ?= 4096
 DAYS ?= 4096
