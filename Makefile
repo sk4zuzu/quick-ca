@@ -108,12 +108,15 @@ $(SELF)/%.cert.pem: $(SELF)/%.csr.pem $(SELF)/$(DOMAIN).key.pem $(SELF)/$(DOMAIN
 
 .PHONY: chains
 
-chains: $(HOSTS:%=$(SELF)/%.$(DOMAIN).chain.pem)
+chains: $(HOSTS:%=$(SELF)/%.$(DOMAIN).chain.pem) $(HOSTS:%=$(SELF)/%.$(DOMAIN).everything.pem)
 
 $(SELF)/%.chain.pem: $(SELF)/%.cert.pem $(SELF)/$(DOMAIN).cacert.pem
+	cat $^ > $@
+
+$(SELF)/%.everything.pem: $(SELF)/%.cert.pem $(SELF)/$(DOMAIN).cacert.pem $(SELF)/%.key.pem
 	cat $^ > $@
 
 .PHONY: wildcard
 
 wildcard: CUSTOM_CN = *.$(DOMAIN)
-wildcard: $(SELF)/wildcard.$(DOMAIN).key.pem $(SELF)/wildcard.$(DOMAIN).cert.pem $(SELF)/wildcard.$(DOMAIN).chain.pem
+wildcard: $(SELF)/wildcard.$(DOMAIN).key.pem $(SELF)/wildcard.$(DOMAIN).cert.pem $(SELF)/wildcard.$(DOMAIN).chain.pem $(SELF)/wildcard.$(DOMAIN).everything.pem
