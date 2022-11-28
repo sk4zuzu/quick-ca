@@ -5,11 +5,13 @@ SELF    := $(patsubst %/,%,$(dir $(abspath $(firstword $(MAKEFILE_LIST)))))
 HOSTS  ?= c1 c2 c3
 DOMAIN ?= poc.svc
 
+COUNTRY ?= PL
+
 BITS ?= 4096
 DAYS ?= 4096
 
 define STDIN1
-PL
+$(COUNTRY)
 .
 .
 .
@@ -25,12 +27,12 @@ prompt = no
 default_md = sha256
 distinguished_name = dn
 [dn]
-C = PL
+C = $(COUNTRY)
 CN = $(if $(CUSTOM_CN),$(CUSTOM_CN),$(1))
 endef
 
 define STDIN2
-PL
+$(COUNTRY)
 .
 .
 .
